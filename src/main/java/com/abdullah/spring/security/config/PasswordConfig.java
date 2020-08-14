@@ -1,4 +1,4 @@
-package com.abdullah.spring.security.basicAuth;
+package com.abdullah.spring.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

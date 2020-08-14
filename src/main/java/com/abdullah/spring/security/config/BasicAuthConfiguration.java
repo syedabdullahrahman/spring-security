@@ -1,4 +1,4 @@
-package com.abdullah.spring.security.basicAuth;
+package com.abdullah.spring.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import static com.abdullah.spring.security.config.ApplicationUserRole.ADMIN;
+import static com.abdullah.spring.security.config.ApplicationUserRole.STUDENT;
 
 @Configuration
 @EnableWebSecurity
@@ -54,14 +57,21 @@ public class BasicAuthConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/","index","/css/*","/js/*")
-                .permitAll()
+                .antMatchers("/", "index", "/css/*", "/js/*").permitAll()  // This URLs can be accessed by all
+                .antMatchers("/api/**").hasRole(STUDENT.name())     //This URLs needs Role Based permissions
                 .anyRequest()
                 .authenticated()
                 .and()
                 .httpBasic();
     }
 
+    /*    */
+
+    /**
+     * Basic auth user login per new new request
+     *
+     * @return
+     *//*
     @Override
     @Bean
     protected UserDetailsService userDetailsService() {
@@ -71,7 +81,31 @@ public class BasicAuthConfiguration extends WebSecurityConfigurerAdapter {
                 .roles("STUDENT")
                 .build();
 
-        return new InMemoryUserDetailsManager(anna);
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin123"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(anna,admin);
+
+    }*/
+    @Override
+    @Bean
+    protected UserDetailsService userDetailsService() {
+        UserDetails anna = User.builder()
+                .username("anna")
+                .password(passwordEncoder.encode("a1"))
+                .roles(STUDENT.name())
+                .build();
+
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin123"))
+                .roles(ADMIN.name())
+                .build();
+
+        return new InMemoryUserDetailsManager(anna, admin);
 
     }
 }
